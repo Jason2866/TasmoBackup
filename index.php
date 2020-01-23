@@ -26,63 +26,21 @@ if (isset($_POST["name"])) {
 
 if ($task == "discover") {
     $show_modal = true;
-    $output = "Does not appear to be a Tasmota device!!";
-    if (getTasmotaScan($ip, $user, $password)) {
-        if ($status=getTasmotaStatus($ip, $user, $password)) {
-            if ($status2=getTasmotaStatus2($ip, $user, $password)) {
-                if (dbDeviceExist($ip)) {
-                    $show_modal=true;
-                    $output = 'This device already exists in the database!';
-                } else {
-                    $name=$status['Status']['FriendlyName'][0];
-                    $version=$status2['StatusFWR']['Version'];
-                    if (dbDeviceAdd($name, $ip, $version, $password)) {
-                        $show_modal = true;
-                        $output = "<center><b>" . $name . " Added Successfully!</b><center>";
-                    } else {
-                        $show_modal = true;
-                        $output = "Error adding device";
-                    }
-                }
-            }
-        }
-    }
+    $output = '<center>'.addTasmotaDevice($ip, $user, $password).'<br></center>';
 }
 
 if ($task == "discoverall") {
-    $aDoor = $_POST['ip'];
-    if (empty($ip)) {
-        echo("You didn't select any devices.");
+    $show_modal = true;
+    $output = '<center>';
+    if (!is_array($ip)) {
+        $output .= "You didn't select any devices.<br>";
     } else {
-        $N = count($ip);
-
-        for ($i=0; $i < $N; $i++) {
-            $show_modal = true;
-            $output = "Does not appear to be a Tasmota device!!";
-            if (getTasmotaScan($ip[$i], $user, $password)) {
-                if ($status=getTasmotaStatus($ip[$i], $user, $password)) {
-                    if ($status2=getTasmotaStatus2($ip[$i], $user, $password)) {
-                        if (dbDeviceExist($ip[$i])) {
-                            $outputalready = $ip[$i] . ", " . $outputalready;
-                        } else {
-                            $name=$status['Status']['FriendlyName'][0];
-                            $version=$status2['StatusFWR']['Version'];
-                            if (dbDeviceAdd($name, $ip[$i], $version, $password)) {
-                                $outputok = $name . ", " . $outputok;
-                            } else {
-                                $outputbad = $name . ", " . $outputbad;
-                            }
-                        }
-                    }
-                }
-            }
+        foreach($ip as $i) {
+            $output .= addTasmotaDevice($i, $user, $password).'<br>';
         }
     }
-    $show_modal=true;
-    $output = $outputalready . " already exist.<br>" . $outputbad . " unable to be added.<br>" . $outputok . " added successfully.";
+    $output .= '</center>'; 
 }
-
-
 
 
 if ($task == "edit") {

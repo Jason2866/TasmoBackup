@@ -37,13 +37,15 @@ $(document).ready(function() {
     <table class="table table-striped table-bordered" id="status">                                          
     <thead>                                                                                                  
     <tr><th colspan="9"><center><b>TasmoBackup</th></tr>
-	    <form action="index.php" method="POST"><input type="hidden" name="task" value="discover">
+	    <form action="index.php" method="POST">
+                <input type="hidden" name="task" value="discoverall">
+                <?php if(isset($_POST['user'])) { echo '<input type="hidden" name="user" value="'.$_POST['user'].'">'; } ?>
+                <?php if(isset($_POST['password'])) { echo '<input type="hidden" name="password" value="'.$_POST['password'].'">'; } ?>
         <tr><th><b>ADD</th><th>NAME</th><th><b>IP</b></th></tr>
     </thead>                                                                                                
     <tbody>  
 
 <?php
-        $id=1;
 require 'functions.inc.php';
 
 
@@ -77,10 +79,9 @@ if ($_POST["task"]=="scan") {
                     if (getTasmotaScan($ip, $user, $password)) {
                         if ($status=getTasmotaStatus($ip, $user, $password)) {
                             $name=$status['Status']['FriendlyName'][0];
-                            echo "<tr valign='middle'><td><center><input type='hidden' name='id[]' value='" . $id . "'><input type='checkbox' name='ip' value='" . $ip . "'></td>".
+                            echo "<tr valign='middle'><td><center><input type='checkbox' name='ip[]' value='" . $ip . "'></td>".
                      "<td>" . $name . "</td>".
                      "<td><center><a href='http://" . $ip . "'>" . $ip . "</a></td></tr>";
-                            $id=$id+1;
                         }
                     }
                 }

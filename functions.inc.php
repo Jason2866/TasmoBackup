@@ -154,3 +154,26 @@ function backupAll()
     }
     return $errorcount;
 }
+
+function addTasmotaDevice($ip, $user, $password)
+{
+    if (getTasmotaScan($ip, $user, $password)) {
+        if (dbDeviceExist($ip)) {
+            return $ip.': This device already exists in the database!';
+        } else {
+            if ($status=getTasmotaStatus($ip, $user, $password)) {
+                if ($status2=getTasmotaStatus2($ip, $user, $password)) {
+                    $name=$status['Status']['FriendlyName'][0];
+                    $version=$status2['StatusFWR']['Version'];
+                    if (dbDeviceAdd($name, $ip, $version, $password)) {
+                        return $ip. ': ' . $name . ' Added Successfully!';
+                    }
+                    return $ip.': '. $name . ' Error adding device to database.';
+                }
+                return $ip.': Device not responding to status2 request.';
+            }
+            return $ip.': Device not responding to status request.';
+        }
+    }
+    return $ip.': Device not found.';
+}
